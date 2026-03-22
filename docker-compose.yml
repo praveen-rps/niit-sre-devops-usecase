@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  registry-service:
+    build: ./registry-service
+    container_name: registry-service
+    ports:
+      - "8761:8761"
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - registry-service
+    environment:
+      - EUREKA_SERVER=[registry-service](http://registry-service:8761/eureka/)
+
+  product-service:
+    build: ./product-service
+    container_name: product-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - registry-service
+    environment:
+      - EUREKA_SERVER=[registry-service](http://registry-service:8761/eureka/)
+
+  order-service:
+    build: ./order-service
+    #image: sripraveen/order-service-updated:latest
+    container_name: order-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - user-service
+      - product-service
+      - registry-service
+    environment:
+      - EUREKA_SERVER=[registry-service](http://registry-service:8761/eureka/)
